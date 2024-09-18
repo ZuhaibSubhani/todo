@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>todo</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    
+    <script>let  id=1;
+    async function add(){
+        const text = document.getElementById('task').value;
+        await axios.post("http://localhost:3000/create",{
+            task:text
+        })
+        info();
+        //window.location.reload;
+      
+}
+    function display(todo){
+        const taskdiv=document.createElement('div');
+        const delbutton=document.createElement('button');
+        taskdiv.id=todo.id;
+        delbutton.id=todo.id;
+        taskdiv.textContent=todo.task;
+        delbutton.textContent="delete"
+        delbutton.onclick=function(){
+            remove(delbutton.id)
+        }
+        const div=document.getElementById('container');
+        taskdiv.append(delbutton);
+        div.append(taskdiv)  
+        
+    }
+    async function info(){
+        const response=await axios.get("http://localhost:3000/me")
+        if(response.data.todos.length!==0){
+            const div=document.getElementById('container');
+            div.innerHTML=""
+            let todos=response.data.todos;
+            todos.forEach(todo => display(todo)); 
+        }
+    }
+    info();
+    async function remove(id){
+        await axios.post("http://localhost:3000/delete",{
+            id:id
+        })
+        info();
+    }
+    </script>
+</head>
+
+<body>
+    <h1> TODO</h1>
+    <input type="text" placeholder="enter task" id="task"> <button onclick="add()">add </button> <br>
+    <div id="container"></div>
+
+</body>
+</html>
